@@ -1,0 +1,84 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { GridDots, ScreenShell, SectionBadge } from "@/components/ui/shell";
+import type { BusinessType } from "@/lib/types";
+import { cn } from "@/lib/utils";
+
+const options: Array<{
+  id: BusinessType;
+  label: string;
+  description: string;
+}> = [
+  { id: "agency", label: "Agency", description: "Marketing, dev, design, PR" },
+  { id: "freelancer", label: "Freelancer", description: "Solo consultant or contractor" },
+  { id: "consultant", label: "Consultant", description: "Business, legal, finance" },
+  { id: "startup", label: "Startup", description: "Early team, scaling ops" }
+];
+
+export default function OnboardPage() {
+  const router = useRouter();
+  const [selected, setSelected] = useState<BusinessType>("agency");
+  const summary = useMemo(
+    () => options.find((option) => option.id === selected),
+    [selected]
+  );
+
+  function handleContinue() {
+    window.localStorage.setItem("businessType", selected);
+    router.push("/coach");
+  }
+
+  return (
+    <ScreenShell className="flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+      <GridDots />
+      <div className="relative z-10 w-full max-w-3xl rounded-[2rem] border border-border/70 bg-card/75 p-6 shadow-glow sm:p-8">
+        <SectionBadge>Step 1 of 2</SectionBadge>
+        <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl">
+          What kind of business do you run?
+        </h1>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+          We use this to shape the conversation and examples around your business model instead of giving you generic startup advice.
+        </p>
+
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          {options.map((option) => {
+            const isActive = option.id === selected;
+
+            return (
+              <button
+                className={cn(
+                  "min-h-32 rounded-3xl border p-5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  isActive
+                    ? "border-primary/40 bg-primary/10 shadow-glow"
+                    : "border-border/70 bg-background/40 motion-safe:hover:border-primary/30 motion-safe:hover:bg-card"
+                )}
+                key={option.id}
+                onClick={() => setSelected(option.id)}
+                type="button"
+              >
+                <p className="text-base font-semibold text-foreground">{option.label}</p>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{option.description}</p>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-8 flex flex-col gap-4 rounded-3xl border border-border/60 bg-background/40 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">Selected profile</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {summary?.label}: {summary?.description}
+            </p>
+          </div>
+          <Button className="w-full sm:w-auto" onClick={handleContinue}>
+            Continue to OPT Coach
+          </Button>
+        </div>
+      </div>
+    </ScreenShell>
+  );
+}
