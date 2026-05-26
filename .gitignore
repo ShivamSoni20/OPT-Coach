@@ -1,0 +1,11 @@
+.next
+node_modules
+.codex
+.env
+.env.local
+.env.*
+!.env.example
+OPT-COACH-MVP-DEVPLAN.md
+opt-coach-ui.jsx
+dist
+coverage

@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 160 62% 4%;
+  --foreground: 152 54% 95%;
+  --card: 160 38% 8%;
+  --card-foreground: 152 54% 95%;
+  --popover: 160 42% 7%;
+  --popover-foreground: 152 54% 95%;
+  --primary: 152 76% 46%;
+  --primary-foreground: 158 60% 6%;
+  --secondary: 157 30% 14%;
+  --secondary-foreground: 152 54% 95%;
+  --muted: 159 31% 13%;
+  --muted-foreground: 151 33% 71%;
+  --accent: 152 45% 16%;
+  --accent-foreground: 152 54% 95%;
+  --border: 154 33% 19%;
+  --input: 154 33% 19%;
+  --ring: 152 76% 46%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.2), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(5, 150, 105, 0.16), transparent 26%),
+    hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+@layer utilities {
+  .surface-grid {
+    background-image:
+      linear-gradient(rgba(110, 231, 183, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(110, 231, 183, 0.06) 1px, transparent 1px);
+    background-size: 34px 34px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
