@@ -1,8 +1,8 @@
 "use client";
 
+import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { nanoid } from "nanoid";
 
 import { BrainPreview } from "@/components/coach/brain-preview";
 import { ChatInput } from "@/components/coach/chat-input";
@@ -20,11 +20,20 @@ const businessTypeLabels: Record<BusinessType, string> = {
   startup: "Startup"
 };
 
+const mobileSteps = [
+  "Operating model",
+  "Onboarding",
+  "Delivery",
+  "Approval",
+  "Tribal knowledge"
+];
+
 export default function CoachPage() {
   const router = useRouter();
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const [sessionId] = useState(() => nanoid());
   const [businessType, setBusinessType] = useState<BusinessType>("agency");
+  const [businessName, setBusinessName] = useState("");
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,9 +43,16 @@ export default function CoachPage() {
 
   useEffect(() => {
     const storedType = window.localStorage.getItem("businessType") as BusinessType | null;
+    const storedName = window.localStorage.getItem("businessName");
+
     if (storedType) {
       setBusinessType(storedType);
     }
+
+    if (storedName) {
+      setBusinessName(storedName);
+    }
+
     setStarted(true);
   }, []);
 
@@ -86,6 +102,7 @@ export default function CoachPage() {
         body: JSON.stringify({
           sessionId,
           businessType,
+          businessName,
           userMessage: isInit ? "Start" : userText
         })
       });
@@ -166,14 +183,14 @@ export default function CoachPage() {
             <div>
               <p className="text-sm font-semibold text-foreground">OPT Coach</p>
               <p className="text-sm text-muted-foreground">
-                {businessTypeLabels[businessType]} flow · {questionsAnswered}/5 answered
+                {businessName || "Untitled business"} · {businessTypeLabels[businessType]} flow · {questionsAnswered}/5 answered
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">
                 {businessTypeLabels[businessType]}
               </div>
-              <Button href="/onboard" variant="ghost">
+              <Button className="w-full sm:w-auto" href="/onboard" variant="ghost">
                 Change type
               </Button>
             </div>
@@ -184,6 +201,30 @@ export default function CoachPage() {
           <ProgressSidebar questionsAnswered={questionsAnswered} />
 
           <main className="flex min-h-[calc(100vh-80px)] flex-1 flex-col">
+            <div className="border-b border-border/40 px-4 py-3 lg:hidden">
+              <div className="flex flex-wrap gap-2">
+                {mobileSteps.map((step, index) => {
+                  const isDone = index < questionsAnswered;
+                  const isCurrent = index === questionsAnswered;
+
+                  return (
+                    <div
+                      className={`rounded-full border px-3 py-1 text-xs ${
+                        isCurrent
+                          ? "border-primary/30 bg-primary/10 text-foreground"
+                          : isDone
+                            ? "border-primary/20 bg-primary/5 text-primary"
+                            : "border-border/60 bg-background/40 text-muted-foreground"
+                      }`}
+                      key={step}
+                    >
+                      {index + 1}. {step}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="grid flex-1 gap-6 px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1fr)_300px]">
               <section className="flex min-h-[60vh] flex-col rounded-[2rem] border border-border/70 bg-card/70">
                 <div className="border-b border-border/70 px-5 py-4">
@@ -231,7 +272,7 @@ export default function CoachPage() {
                 />
               </section>
 
-              <aside className="space-y-4">
+              <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
                 <BrainPreview questionsAnswered={questionsAnswered} />
                 <div className="rounded-3xl border border-border/70 bg-card/60 p-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Prompting tips</p>
