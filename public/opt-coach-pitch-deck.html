@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPT Coach — Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & tokens ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sage:       #b8d4b0;
+  --sage-lt:    #d4ead0;
+  --sage-pale:  #eef5ec;
+  --teal:       #4dc8bd;
+  --teal-lt:    #7dd9d2;
+  --teal-pale:  #e0f5f3;
+  --wheat:      #ddc89a;
+  --wheat-lt:   #ede2c2;
+  --coral:      #e8714a;
+  --coral-lt:   #f4a98a;
+  --coral-pale: #fce8e0;
+  --mint:       #b8e8e0;
+  --cream:      #f0ece0;
+  --green-dk:   #5a9e7a;
+  --green-md:   #7bbf96;
+  --ink:        #2a2d24;
+  --ink-md:     #4a5042;
+  --ink-lt:     #7a8270;
+  --bg:         #f7f4ee;
+  --white:      #ffffff;
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-sans:  'DM Sans', system-ui, sans-serif;
+  --font-mono:  'DM Mono', monospace;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+/* ─── Deck shell ────────────────────────────────────────────────── */
+.deck {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+/* ─── Slides ────────────────────────────────────────────────────── */
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(48px);
+  transition: opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
+}
+.slide.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(0);
+}
+.slide.exit {
+  opacity: 0;
+  transform: translateX(-48px);
+  pointer-events: none;
+}
+
+/* ─── Slide bg patterns ─────────────────────────────────────────── */
+.slide-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  animation: floatBlob var(--spd, 14s) ease-in-out infinite;
+}
+.dot-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(77,200,189,.09) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,.5), transparent 68%);
+}
+
+/* ─── Animations ────────────────────────────────────────────────── */
+@keyframes floatBlob {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%     { transform: translate(22px,-18px) scale(1.05); }
+  66%     { transform: translate(-12px,14px) scale(.96); }
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes drawBar {
+  from { width: 0; }
+  to   { width: var(--w); }
+}
+@keyframes pulseDot {
+  0%,100% { transform:scale(1); opacity:.7; }
+  50%     { transform:scale(1.25); opacity:1; }
+}
+@keyframes shimmerBadge {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+@keyframes countUp {
+  from { opacity:0; transform:translateY(8px) scale(.9); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* ─── Slide content base ────────────────────────────────────────── */
+.slide-inner {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 44px 64px 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ─── Top bar (slide label + number) ───────────────────────────── */
+.slide-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  animation: fadeUp .5s ease both;
+}
+.slide-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, rgba(77,200,189,.12), rgba(184,212,176,.1));
+  border: 1px solid rgba(77,200,189,.3);
+  color: var(--green-dk);
+}
+.slide-label::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: pulseDot 2s ease-in-out infinite;
+}
+.slide-num {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--ink-lt);
+}
+
+/* ─── Headings ──────────────────────────────────────────────────── */
+.deck-headline {
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 4.5vw, 58px);
+  line-height: 1.1;
+  letter-spacing: -.03em;
+  color: var(--ink);
+}
+.deck-headline em {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--teal), var(--green-dk));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.deck-sub {
+  font-size: 16px;
+  color: var(--ink-lt);
+  line-height: 1.72;
+  max-width: 560px;
+  font-weight: 300;
+  margin-top: 10px;
+}
+
+/* ─── Logo mark ─────────────────────────────────────────────────── */
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  animation: fadeUp .5s ease both;
+}
+.logo-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--teal), var(--green-dk));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 4px 16px rgba(77,200,189,.3);
+}
+.logo-text {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--ink);
+}
+
+/* ─── Nav bar ────────────────────────────────────────────────────── */
+.nav-bar {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(184,212,176,.4);
+  border-radius: 50px;
+  padding: 8px 14px;
+  box-shadow: 0 4px 24px rgba(42,45,36,.1);
+}
+.nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(184,212,176,.5);
+  border: none;
+  cursor: pointer;
+  transition: all .2s;
+  padding: 0;
+}
+.nav-dot.active { background: var(--teal); transform: scale(1.3); }
+.nav-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(184,212,176,.5);
+  background: transparent;
+  color: var(--ink-md);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.nav-btn:hover { background: var(--teal-pale); border-color: rgba(77,200,189,.4); color: var(--green-dk); }
+.nav-btn:disabled { opacity: .3; cursor: default; }
+.nav-divider { width: 1px; height: 20px; background: rgba(184,212,176,.4); margin: 0 4px; }
+
+/* ─── Keyboard hint ─────────────────────────────────────────────── */
+.key-hint {
+  position: fixed;
+  bottom: 32px;
+  right: 40px;
+  font-size: 10px;
+  color: var(--ink-lt);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.key {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255,255,255,.7);
+  border: 1px solid rgba(184,212,176,.4);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+/* ─── Progress line ─────────────────────────────────────────────── */
+.progress-line {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2.5px;
+  background: linear-gradient(90deg, var(--teal), var(--green-dk));
+  transition: width .4s cubic-bezier(.4,0,.2,1);
+  z-index: 200;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SLIDE 1 — PROBLEM
+═══════════════════════════════════════════════════════════════════ */
+.s1-body { display: flex; gap: 60px; align-items: flex-start; flex: 1; }
+.s1-left { flex: 1; }
+.s1-right { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
+
+.pain-card {
+  padding: 20px 22px;
+  border-radius: 18px;
+  border: 1px solid rgba(184,212,176,.35);
+  background: var(--white);
+  box-shadow: 0 2px 12px rgba(42,45,36,.05);
+  animation: fadeUp .5s ease both;
+  position: relative;
+  overflow: hidden;
+}
+.pain-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 3px 0 0 3px;
+}
+.pain-card.red::before   { background: var(--coral); }
+.pain-card.amber::before { background: var(--wheat); }
+.pain-card.teal::before  { background: var(--teal); }
+
+.pain-card-icon { font-size: 22px; margin-bottom: 8px; }
+.pain-card-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.pain-card-desc  { font-size: 12px; color: var(--ink-lt); line-height: 1.65; }
+
+.stat-callout {
+  margin-top: 28px;
+  padding: 20px 24px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(77,200,189,.08), rgba(184,212,176,.1));
+  border: 1px solid rgba(77,200,189,.2);
+  animation: fadeUp .5s .35s ease both;
+}
+.stat-row { display: flex; gap: 32px; }
+.stat-item { text-align: center; }
+.stat-val {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  background: linear-gradient(135deg, var(--teal), var(--green-dk));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: countUp .6s .5s ease both;
+  opacity: 0;
+  animation-fill-mode: both;
+}
+.stat-label { font-size: 11px; color: var(--ink-lt); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SLIDE 2 — SOLUTION + USER JOURNEY
+═══════════════════════════════════════════════════════════════════ */
+.journey-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  flex: 1;
+  align-items: center;
+}
+.journey-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  animation: fadeUp .5s ease both;
+  padding: 0 8px;
+}
+.journey-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  top: 28px;
+  width: 20px;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgba(77,200,189,.5), rgba(184,212,176,.3));
+}
+.step-icon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 16px rgba(42,45,36,.07);
+  position: relative;
+}
+.step-num {
+  position: absolute;
+  top: -8px; right: -8px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.step-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+.step-desc  { font-size: 11px; color: var(--ink-lt); line-height: 1.6; }
+
+.output-bar {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  animation: fadeUp .5s .4s ease both;
+}
+.output-file {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(184,212,176,.3);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.output-file-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.output-file-name  { font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--ink); }
+.output-file-label { font-size: 10px; color: var(--ink-lt); margin-top: 1px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SLIDE 3 — TECH STACK
+═══════════════════════════════════════════════════════════════════ */
+.stack-body { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1; }
+.stack-col { display: flex; flex-direction: column; gap: 12px; }
+
+.stack-group {
+  border-radius: 18px;
+  border: 1px solid rgba(184,212,176,.3);
+  background: var(--white);
+  overflow: hidden;
+  animation: fadeUp .5s ease both;
+  box-shadow: 0 2px 12px rgba(42,45,36,.04);
+}
+.stack-group-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(184,212,176,.2);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stack-group-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+
+.stack-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.stack-item-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.stack-item-desc { font-size: 11px; color: var(--ink-lt); line-height: 1.5; }
+
+.arch-flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--ink);
+  color: rgba(255,255,255,.8);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  animation: fadeUp .5s .45s ease both;
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+.arch-arrow { color: rgba(77,200,189,.7); font-size: 14px; }
+.arch-node {
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.1);
+  font-size: 11px;
+}
+.arch-node.hl {
+  background: rgba(77,200,189,.18);
+  border-color: rgba(77,200,189,.35);
+  color: var(--teal-lt);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SLIDE 4 — TARGET AUDIENCE
+═══════════════════════════════════════════════════════════════════ */
+.audience-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 14px;
+  flex: 1;
+  margin-bottom: 16px;
+}
+.audience-card {
+  border-radius: 18px;
+  padding: 22px 24px;
+  border: 1px solid rgba(184,212,176,.3);
+  background: var(--white);
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  animation: fadeUp .5s ease both;
+  box-shadow: 0 2px 12px rgba(42,45,36,.04);
+  transition: transform .2s, box-shadow .2s;
+}
+.audience-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(42,45,36,.09);
+}
+.audience-emoji {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.audience-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+.audience-desc  { font-size: 12px; color: var(--ink-lt); line-height: 1.65; }
+.audience-tag {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.market-strip {
+  padding: 16px 22px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(77,200,189,.07), rgba(184,212,176,.09));
+  border: 1px solid rgba(77,200,189,.2);
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  animation: fadeUp .5s .4s ease both;
+}
+.market-item { text-align: center; }
+.market-val {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  background: linear-gradient(135deg, var(--teal), var(--green-dk));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.market-label { font-size: 10px; color: var(--ink-lt); margin-top: 2px; }
+.market-divider { width: 1px; height: 40px; background: rgba(184,212,176,.4); }
+.market-caption { flex: 1; font-size: 13px; color: var(--ink-md); line-height: 1.65; }
+</style>
+</head>
+<body>
+
+<div class="progress-line" id="progressLine"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ════════════════════════════════════════════════════════════
+       SLIDE 1 — PROBLEM
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="slide active" id="slide-0">
+    <div class="slide-bg">
+      <div class="dot-grid"></div>
+      <div class="blob" style="width:460px;height:460px;top:-80px;right:-60px;background:radial-gradient(circle,rgba(77,200,189,.11),transparent 70%);--spd:13s"></div>
+      <div class="blob" style="width:320px;height:320px;bottom:-60px;left:-40px;background:radial-gradient(circle,rgba(184,212,176,.14),transparent 70%);--spd:17s"></div>
+      <div class="blob" style="width:200px;height:200px;top:40%;left:38%;background:radial-gradient(circle,rgba(232,113,74,.07),transparent 70%);--spd:21s"></div>
+    </div>
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="slide-label">The Problem</div>
+        <div class="slide-num">01 / 04</div>
+      </div>
+
+      <div class="logo-mark" style="animation-delay:.1s">
+        <div class="logo-icon">🧠</div>
+        <span class="logo-text">OPT Coach</span>
+      </div>
+
+      <div class="s1-body">
+        <div class="s1-left">
+          <h1 class="deck-headline" style="animation:fadeUp .5s .1s ease both;opacity:0;animation-fill-mode:both">
+            Indian service businesses<br>
+            run on <em>tribal knowledge.</em>
+          </h1>
+          <p class="deck-sub" style="animation:fadeUp .5s .2s ease both;opacity:0;animation-fill-mode:both">
+            Every agency, consultant, and freelancer carries their entire operating system in their head and in WhatsApp threads. When someone leaves — that knowledge disappears forever.
+          </p>
+
+          <div class="stat-callout">
+            <div class="stat-row">
+              <div class="stat-item">
+                <div class="stat-val" style="animation-delay:.5s">63M+</div>
+                <div class="stat-label">Indian MSMEs with zero documentation</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-val" style="animation-delay:.65s">6 mo</div>
+                <div class="stat-label">to onboard one new team member</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-val" style="animation-delay:.8s">0</div>
+                <div class="stat-label">AI tools that work without context</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s1-right">
+          <div class="pain-card red" style="animation-delay:.2s">
+            <div class="pain-card-icon">💬</div>
+            <div class="pain-card-title">Knowledge lives in WhatsApp</div>
+            <div class="pain-card-desc">Every SOP, pricing logic, and client rule is buried in a thread. Searching takes hours. New hires never find it.</div>
+          </div>
+          <div class="pain-card amber" style="animation-delay:.3s">
+            <div class="pain-card-icon">🤖</div>
+            <div class="pain-card-title">AI agents fail without context</div>
+            <div class="pain-card-desc">ChatGPT, n8n, custom GPTs — they produce generic output because there's no company-specific knowledge to ground them.</div>
+          </div>
+          <div class="pain-card teal" style="animation-delay:.4s">
+            <div class="pain-card-icon">⏳</div>
+            <div class="pain-card-title">Documentation takes months</div>
+            <div class="pain-card-desc">Notion, Confluence, wikis — they all require sustained effort. Real work takes over. The system decays after 2 weeks.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SLIDE 2 — SOLUTION + USER JOURNEY
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-1">
+    <div class="slide-bg">
+      <div class="dot-grid"></div>
+      <div class="blob" style="width:400px;height:400px;top:-60px;left:-40px;background:radial-gradient(circle,rgba(184,212,176,.14),transparent 70%);--spd:14s"></div>
+      <div class="blob" style="width:340px;height:340px;bottom:-50px;right:-30px;background:radial-gradient(circle,rgba(77,200,189,.1),transparent 70%);--spd:19s"></div>
+    </div>
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="slide-label">Solution &amp; User Journey</div>
+        <div class="slide-num">02 / 04</div>
+      </div>
+
+      <div style="animation:fadeUp .5s .1s ease both;opacity:0;animation-fill-mode:both;margin-bottom:32px">
+        <h2 class="deck-headline">
+          5 questions.<br><em>One Company Brain.</em>
+        </h2>
+        <p class="deck-sub">
+          OPT Coach walks any business owner through a structured conversation and auto-generates a live, AI-ready knowledge base in under 20 minutes.
+        </p>
+      </div>
+
+      <div class="journey-grid">
+        <div class="journey-step" style="animation-delay:.15s">
+          <div class="step-icon" style="background:var(--teal-pale);border:1.5px solid rgba(77,200,189,.3)">
+            🏢
+            <span class="step-num">1</span>
+          </div>
+          <div class="step-title">Pick business type</div>
+          <div class="step-desc">Agency, freelancer, consultant, or startup — the conversation adapts instantly</div>
+        </div>
+        <div class="journey-step" style="animation-delay:.25s">
+          <div class="step-icon" style="background:var(--sage-pale);border:1.5px solid rgba(184,212,176,.4)">
+            ✏️
+            <span class="step-num">2</span>
+          </div>
+          <div class="step-title">Enter business name</div>
+          <div class="step-desc">One field. Takes 5 seconds. Used to personalise every output</div>
+        </div>
+        <div class="journey-step" style="animation-delay:.35s">
+          <div class="step-icon" style="background:var(--wheat-lt);border:1.5px solid rgba(221,200,154,.4)">
+            💬
+            <span class="step-num">3</span>
+          </div>
+          <div class="step-title">Answer 5 questions</div>
+          <div class="step-desc">OPT framework: Operating Model → Processes → Tasks. One at a time</div>
+        </div>
+        <div class="journey-step" style="animation-delay:.45s">
+          <div class="step-icon" style="background:var(--coral-pale);border:1.5px solid rgba(232,113,74,.25)">
+            ⚡
+            <span class="step-num">4</span>
+          </div>
+          <div class="step-title">Brain generates</div>
+          <div class="step-desc">AI extracts structured context. Streams in real-time. Takes ~60 seconds</div>
+        </div>
+        <div class="journey-step" style="animation-delay:.55s">
+          <div class="step-icon" style="background:linear-gradient(135deg,var(--teal-pale),var(--sage-pale));border:1.5px solid rgba(77,200,189,.3)">
+            🚀
+            <span class="step-num">5</span>
+          </div>
+          <div class="step-title">Ship &amp; share</div>
+          <div class="step-desc">Live dashboard, shareable URL, and public JSON API — all ready immediately</div>
+        </div>
+      </div>
+
+      <div class="output-bar">
+        <div class="output-file">
+          <div class="output-file-icon" style="background:var(--teal-pale)">📄</div>
+          <div>
+            <div class="output-file-name">KNOWLEDGE.md</div>
+            <div class="output-file-label">Business context for agents</div>
+          </div>
+        </div>
+        <div class="output-file">
+          <div class="output-file-icon" style="background:var(--wheat-lt)">🔀</div>
+          <div>
+            <div class="output-file-name">PROCESSES.md</div>
+            <div class="output-file-label">Workflows + owners + triggers</div>
+          </div>
+        </div>
+        <div class="output-file">
+          <div class="output-file-icon" style="background:var(--sage-pale)">⚖️</div>
+          <div>
+            <div class="output-file-name">JUDGMENT.md</div>
+            <div class="output-file-label">Quality criteria + hard rules</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SLIDE 3 — TECH STACK
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-2">
+    <div class="slide-bg">
+      <div class="dot-grid"></div>
+      <div class="blob" style="width:360px;height:360px;top:-40px;right:0;background:radial-gradient(circle,rgba(77,200,189,.1),transparent 70%);--spd:15s"></div>
+      <div class="blob" style="width:280px;height:280px;bottom:-30px;left:10%;background:radial-gradient(circle,rgba(184,212,176,.12),transparent 70%);--spd:20s"></div>
+    </div>
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="slide-label">Tools &amp; Tech Stack</div>
+        <div class="slide-num">03 / 04</div>
+      </div>
+
+      <div style="animation:fadeUp .5s .1s ease both;opacity:0;animation-fill-mode:both;margin-bottom:28px">
+        <h2 class="deck-headline">Built to <em>ship fast,</em><br>built to last.</h2>
+        <p class="deck-sub">Entirely serverless. Zero infrastructure management. Deployed to production in one command.</p>
+      </div>
+
+      <div class="stack-body">
+        <div class="stack-col">
+          <div class="stack-group" style="animation-delay:.15s">
+            <div class="stack-group-header" style="color:var(--green-dk)">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0"></span>
+              Frontend
+            </div>
+            <div class="stack-group-body">
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:var(--teal-pale);border:1px solid rgba(77,200,189,.3);color:var(--green-dk)">Next.js 14</span>
+                <span class="stack-item-desc">App Router, SSR, API routes</span>
+              </div>
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:var(--sage-pale);border:1px solid rgba(184,212,176,.4);color:var(--green-dk)">Tailwind CSS</span>
+                <span class="stack-item-desc">Custom pastel design system</span>
+              </div>
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:var(--cream);border:1px solid rgba(221,200,154,.4);color:var(--ink-md)">TypeScript</span>
+                <span class="stack-item-desc">End-to-end type safety</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack-group" style="animation-delay:.25s">
+            <div class="stack-group-header" style="color:#8a6530">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--wheat);flex-shrink:0"></span>
+              AI / Language Model
+            </div>
+            <div class="stack-group-body">
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:var(--wheat-lt);border:1px solid rgba(221,200,154,.5);color:#7a5a20">AIML API</span>
+                <span class="stack-item-desc">OpenAI-compatible gateway</span>
+              </div>
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:var(--wheat-lt);border:1px solid rgba(221,200,154,.5);color:#7a5a20">GPT-4o mini</span>
+                <span class="stack-item-desc">Streaming + JSON mode</span>
+              </div>
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:var(--coral-pale);border:1px solid rgba(232,113,74,.25);color:#a04020">Codex</span>
+                <span class="stack-item-desc">Built with OpenAI Codex agent</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack-col">
+          <div class="stack-group" style="animation-delay:.2s">
+            <div class="stack-group-header" style="color:#185fa5">
+              <span style="width:6px;height:6px;border-radius:50%;background:#378add;flex-shrink:0"></span>
+              Database &amp; Storage
+            </div>
+            <div class="stack-group-body">
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:#e6f4ea;border:1px solid rgba(52,168,83,.3);color:#1a6830">Supabase</span>
+                <span class="stack-item-desc">Postgres — sessions + brains</span>
+              </div>
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:#e6f4ea;border:1px solid rgba(52,168,83,.3);color:#1a6830">Row-Level Security</span>
+                <span class="stack-item-desc">Public reads, server-only writes</span>
+              </div>
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:rgba(55,138,221,.1);border:1px solid rgba(55,138,221,.25);color:#185fa5">JSONB columns</span>
+                <span class="stack-item-desc">Flexible schema for brain data</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack-group" style="animation-delay:.3s">
+            <div class="stack-group-header" style="color:var(--ink-md)">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--ink-lt);flex-shrink:0"></span>
+              Infrastructure &amp; DevOps
+            </div>
+            <div class="stack-group-body">
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:var(--ink);color:var(--white);border:none">Vercel</span>
+                <span class="stack-item-desc">Deploy + Analytics + Edge</span>
+              </div>
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:rgba(42,45,36,.08);border:1px solid rgba(42,45,36,.15);color:var(--ink-md)">GitHub</span>
+                <span class="stack-item-desc">Version control + CI/CD</span>
+              </div>
+              <div class="stack-item">
+                <span class="stack-item-badge" style="background:rgba(42,45,36,.08);border:1px solid rgba(42,45,36,.15);color:var(--ink-md)">Supabase MCP</span>
+                <span class="stack-item-desc">Schema + data via Claude Code</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-flow" style="margin-top:16px">
+        <span class="arch-node hl">User browser</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node">Next.js API route</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node hl">AIML / GPT-4o</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node">Stream to client</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node hl">Supabase Postgres</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-node">Public JSON API</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SLIDE 4 — TARGET AUDIENCE
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-3">
+    <div class="slide-bg">
+      <div class="dot-grid"></div>
+      <div class="blob" style="width:400px;height:400px;top:-70px;right:-50px;background:radial-gradient(circle,rgba(184,212,176,.14),transparent 70%);--spd:12s"></div>
+      <div class="blob" style="width:300px;height:300px;bottom:-50px;left:-30px;background:radial-gradient(circle,rgba(77,200,189,.1),transparent 70%);--spd:18s"></div>
+      <div class="blob" style="width:220px;height:220px;top:35%;right:30%;background:radial-gradient(circle,rgba(232,113,74,.06),transparent 70%);--spd:22s"></div>
+    </div>
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="slide-label">Target Audience</div>
+        <div class="slide-num">04 / 04</div>
+      </div>
+
+      <div style="animation:fadeUp .5s .1s ease both;opacity:0;animation-fill-mode:both;margin-bottom:24px">
+        <h2 class="deck-headline">Built for India's <em>service economy.</em></h2>
+        <p class="deck-sub">63 million MSMEs. All running on memory. All trying to use AI. None with the structured context to make it work.</p>
+      </div>
+
+      <div class="audience-grid">
+        <div class="audience-card" style="animation-delay:.15s">
+          <div class="audience-emoji" style="background:var(--teal-pale)">🏢</div>
+          <div>
+            <div class="audience-title">Digital Agencies</div>
+            <div class="audience-desc">Marketing, dev, design, and PR agencies in Tier 1–3 cities with 3–30 person teams. Client delivery runs on founder instinct and undocumented processes.</div>
+            <span class="audience-tag" style="background:var(--teal-pale);border:1px solid rgba(77,200,189,.3);color:var(--green-dk)">Primary segment</span>
+          </div>
+        </div>
+
+        <div class="audience-card" style="animation-delay:.25s">
+          <div class="audience-emoji" style="background:var(--wheat-lt)">🧑‍💻</div>
+          <div>
+            <div class="audience-title">Freelancers &amp; Solo Consultants</div>
+            <div class="audience-desc">High-billing independents in CA, legal, business consulting, and strategy. Their entire methodology lives in their head — and they're starting to hire.</div>
+            <span class="audience-tag" style="background:var(--wheat-lt);border:1px solid rgba(221,200,154,.5);color:#8a6530">High-intent users</span>
+          </div>
+        </div>
+
+        <div class="audience-card" style="animation-delay:.35s">
+          <div class="audience-emoji" style="background:var(--sage-pale)">📊</div>
+          <div>
+            <div class="audience-title">Early-stage Startups</div>
+            <div class="audience-desc">0–20 person teams moving fast and skipping documentation. When they try to delegate or use AI tools, they realise nothing is written down — and it's costing them scale.</div>
+            <span class="audience-tag" style="background:var(--sage-pale);border:1px solid rgba(184,212,176,.5);color:var(--green-dk)">Scaling pain</span>
+          </div>
+        </div>
+
+        <div class="audience-card" style="animation-delay:.45s">
+          <div class="audience-emoji" style="background:var(--coral-pale)">🤖</div>
+          <div>
+            <div class="audience-title">AI-curious Founders</div>
+            <div class="audience-desc">Business owners who've tried ChatGPT, n8n, or custom GPTs — and found them useless because their company context isn't structured. They need OPT Coach first.</div>
+            <span class="audience-tag" style="background:var(--coral-pale);border:1px solid rgba(232,113,74,.25);color:#a04020">Growing fast</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="market-strip">
+        <div class="market-item">
+          <div class="market-val">63M</div>
+          <div class="market-label">Indian MSMEs</div>
+        </div>
+        <div class="market-divider"></div>
+        <div class="market-item">
+          <div class="market-val">₹220Cr</div>
+          <div class="market-label">Addressable market</div>
+        </div>
+        <div class="market-divider"></div>
+        <div class="market-item">
+          <div class="market-val">20 min</div>
+          <div class="market-label">Time to value</div>
+        </div>
+        <div class="market-divider"></div>
+        <div class="market-caption">Any service business that has started hiring but hasn't documented anything — that's every agency, studio, and consultant in India right now.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" disabled>&#8592;</button>
+  <div class="nav-divider"></div>
+  <button class="nav-dot active" id="dot-0" onclick="goTo(0)"></button>
+  <button class="nav-dot" id="dot-1" onclick="goTo(1)"></button>
+  <button class="nav-dot" id="dot-2" onclick="goTo(2)"></button>
+  <button class="nav-dot" id="dot-3" onclick="goTo(3)"></button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" id="nextBtn" onclick="navigate(1)">&#8594;</button>
+</div>
+
+<div class="key-hint">
+  <span class="key">←</span><span class="key">→</span> to navigate
+</div>
+
+<script>
+let current = 0;
+const total = 4;
+const slides = Array.from(document.querySelectorAll('.slide'));
+const dots   = Array.from(document.querySelectorAll('.nav-dot'));
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const progressLine = document.getElementById('progressLine');
+
+function goTo(index) {
+  if (index < 0 || index >= total || index === current) return;
+
+  slides[current].classList.remove('active');
+  slides[current].classList.add('exit');
+
+  // remove exit class after transition
+  const exiting = slides[current];
+  setTimeout(() => exiting.classList.remove('exit'), 450);
+
+  dots[current].classList.remove('active');
+  current = index;
+  slides[current].classList.add('active');
+  dots[current].classList.add('active');
+
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === total - 1;
+
+  // progress bar
+  const pct = ((current) / (total - 1)) * 100;
+  progressLine.style.width = pct + '%';
+}
+
+function navigate(dir) { goTo(current + dir); }
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate(-1);
+});
+
+// Touch swipe support
+let touchStartX = 0;
+document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend',   (e) => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 50) navigate(dx < 0 ? 1 : -1);
+});
+
+// Set initial progress
+progressLine.style.width = '0%';
+</script>
+</body>
+</html>
