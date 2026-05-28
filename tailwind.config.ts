@@ -2,16 +2,16 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./app/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./lib/**/*.{ts,tsx}"
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}"
   ],
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
-        display: ["Georgia", "Times New Roman", "serif"],
-        mono: ["JetBrains Mono", "Consolas", "Menlo", "Monaco", "monospace"]
+        sans: ["DM Sans", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+        display: ["DM Serif Display", "Georgia", "Times New Roman", "serif"],
+        mono: ["DM Mono", "Fira Code", "Menlo", "Monaco", "monospace"]
       },
       colors: {
         sage: { DEFAULT: "#b8d4b0", lt: "#d4ead0", pale: "#eef5ec" },
@@ -20,7 +20,8 @@ const config: Config = {
         coral: { DEFAULT: "#e8714a", lt: "#f4a98a", pale: "#fce8e0" },
         mint: { DEFAULT: "#b8e8e0", lt: "#daf3ef" },
         cream: { DEFAULT: "#f0ece0", dk: "#e5dfc9" },
-        green: { dk: "#5a9e7a", md: "#7bbf96" },
+        "green-dk": "#5a9e7a",
+        "green-md": "#7bbf96",
         ink: { DEFAULT: "#2a2d24", md: "#4a5042", lt: "#7a8270" },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -57,9 +58,10 @@ const config: Config = {
         ring: "hsl(var(--ring))"
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 2px)",
+        lg: "var(--radius)",
+        xl: "0.875rem",
         "2xl": "1rem",
         "3xl": "1.5rem",
         "4xl": "2rem"
@@ -91,6 +93,10 @@ const config: Config = {
         pulseLine: {
           "0%,100%": { opacity: ".4" },
           "50%": { opacity: "1" }
+        },
+        orbitSlow: {
+          from: { transform: "rotate(0deg) translateX(var(--orbit-r)) rotate(0deg)" },
+          to: { transform: "rotate(360deg) translateX(var(--orbit-r)) rotate(-360deg)" }
         }
       },
       animation: {
@@ -99,10 +105,6 @@ const config: Config = {
         fadeUp: "fadeUp .5s ease both",
         floatBlob: "floatBlob 14s ease-in-out infinite",
         pulseLine: "pulseLine 1.8s ease-in-out infinite"
-      },
-      backgroundImage: {
-        "pastel-radial":
-          "radial-gradient(ellipse at 10% 0%, rgba(77,200,189,.09) 0%, transparent 40%), radial-gradient(ellipse at 90% 100%, rgba(184,212,176,.1) 0%, transparent 40%)"
       }
     }
   },

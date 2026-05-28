@@ -1,75 +1,177 @@
+import { supabaseAdmin } from "@/lib/supabase";
+import type { BrainRecord, SessionState } from "@/lib/types";
+
 type SetOptions = {
   ex?: number;
 };
 
-type MemoryEntry = {
-  expiresAt?: number;
-  value: unknown;
+type KvTable = "sessions" | "brains";
+
+type SessionRow = {
+  id: string;
+  business_type: SessionState["businessType"];
+  business_name: string | null;
+  messages: SessionState["messages"];
+  questions_answered: number;
+  extracted_data: SessionState["extractedData"];
+  status: SessionState["status"];
+  created_at: string;
+  expires_at: string;
 };
 
-declare global {
-  // eslint-disable-next-line no-var
-  var __optCoachMemoryKv: Map<string, MemoryEntry> | undefined;
-}
+type BrainRow = {
+  id: string;
+  business_name: string;
+  business_type: BrainRecord["meta"]["businessType"];
+  generated_at: string;
+  session_duration: number;
+  knowledge: BrainRecord["knowledge"];
+  processes: BrainRecord["processes"];
+  judgment: BrainRecord["judgment"];
+  skills: BrainRecord["skills"];
+  knowledge_md: string;
+  processes_md: string;
+  judgment_md: string;
+  expires_at: string;
+};
 
-const memoryStore = globalThis.__optCoachMemoryKv ?? new Map<string, MemoryEntry>();
+export async function kvGet<T>(key: string): Promise<T | null> {
+  const [table, id] = parseKey(key);
 
-if (!globalThis.__optCoachMemoryKv) {
-  globalThis.__optCoachMemoryKv = memoryStore;
-}
+  if (table === "sessions") {
+    const { data, error } = await supabaseAdmin
+      .from("sessions")
+      .select("*")
+      .eq("id", id)
+      .gt("expires_at", new Date().toISOString())
+      .maybeSingle();
 
-async function resolveRemoteKv() {
-  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-    return null;
-  }
-
-  try {
-    const module = await import("@vercel/kv");
-    return module.kv;
-  } catch {
-    return null;
-  }
-}
-
-function getMemoryValue<T>(key: string) {
-  const item = memoryStore.get(key);
-
-  if (!item) {
-    return null;
-  }
-
-  if (item.expiresAt && item.expiresAt < Date.now()) {
-    memoryStore.delete(key);
-    return null;
-  }
-
-  return item.value as T;
-}
-
-export async function kvGet<T>(key: string) {
-  const remoteKv = await resolveRemoteKv();
-
-  if (remoteKv) {
-    return (await remoteKv.get<T>(key)) ?? null;
-  }
-
-  return getMemoryValue<T>(key);
-}
-
-export async function kvSet<T>(key: string, value: T, options?: SetOptions) {
-  const remoteKv = await resolveRemoteKv();
-
-  if (remoteKv) {
-    if (typeof options?.ex === "number") {
-      await remoteKv.set(key, value, { ex: options.ex });
-    } else {
-      await remoteKv.set(key, value);
+    if (error || !data) {
+      return null;
     }
-    return;
+
+    return deserialize<T>("sessions", data as SessionRow);
   }
 
-  memoryStore.set(key, {
-    value,
-    expiresAt: options?.ex ? Date.now() + options.ex * 1000 : undefined
-  });
+  const { data, error } = await supabaseAdmin
+    .from("brains")
+    .select("*")
+    .eq("id", id)
+    .gt("expires_at", new Date().toISOString())
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return deserialize<T>("brains", data as BrainRow);
+}
+
+export async function kvSet<T>(key: string, value: T, options?: SetOptions): Promise<void> {
+  const [table, id] = parseKey(key);
+  const row = serialize(table, id, value, options?.ex);
+
+  const { error } =
+    table === "sessions"
+      ? await supabaseAdmin.from("sessions").upsert(row as SessionRow, { onConflict: "id" })
+      : await supabaseAdmin.from("brains").upsert(row as BrainRow, { onConflict: "id" });
+
+  if (error) {
+    throw new Error(`kvSet failed: ${error.message}`);
+  }
+}
+
+function parseKey(key: string): [KvTable, string] {
+  if (key.startsWith("session:")) {
+    return ["sessions", key.slice(8)];
+  }
+
+  if (key.startsWith("brain:")) {
+    return ["brains", key.slice(6)];
+  }
+
+  throw new Error(`Unknown KV key prefix: ${key}`);
+}
+
+function serialize(
+  table: KvTable,
+  id: string,
+  value: unknown,
+  ttlSeconds?: number
+): SessionRow | BrainRow {
+  const expiresAt = new Date(
+    Date.now() + (ttlSeconds ?? (table === "sessions" ? 86400 : 2592000)) * 1000
+  ).toISOString();
+
+  if (table === "sessions") {
+    const session = value as SessionState;
+
+    return {
+      id,
+      business_type: session.businessType,
+      business_name: session.businessName ?? null,
+      messages: session.messages,
+      questions_answered: session.questionsAnswered,
+      extracted_data: session.extractedData,
+      status: session.status,
+      created_at: session.createdAt,
+      expires_at: expiresAt
+    };
+  }
+
+  const brain = value as BrainRecord;
+
+  return {
+    id,
+    business_name: brain.meta.businessName,
+    business_type: brain.meta.businessType,
+    generated_at: brain.meta.generatedAt,
+    session_duration: brain.meta.sessionDuration,
+    knowledge: brain.knowledge,
+    processes: brain.processes,
+    judgment: brain.judgment,
+    skills: brain.skills,
+    knowledge_md: brain.markdown.knowledge_md,
+    processes_md: brain.markdown.processes_md,
+    judgment_md: brain.markdown.judgment_md,
+    expires_at: expiresAt
+  };
+}
+
+function deserialize<T>(table: KvTable, row: SessionRow | BrainRow): T {
+  if (table === "sessions") {
+    const sessionRow = row as SessionRow;
+
+    return {
+      id: sessionRow.id,
+      businessType: sessionRow.business_type,
+      businessName: sessionRow.business_name ?? undefined,
+      messages: sessionRow.messages,
+      questionsAnswered: sessionRow.questions_answered,
+      extractedData: sessionRow.extracted_data,
+      status: sessionRow.status,
+      createdAt: sessionRow.created_at
+    } as T;
+  }
+
+  const brainRow = row as BrainRow;
+
+  return {
+    meta: {
+      id: brainRow.id,
+      businessName: brainRow.business_name,
+      businessType: brainRow.business_type,
+      generatedAt: brainRow.generated_at,
+      sessionDuration: brainRow.session_duration
+    },
+    knowledge: brainRow.knowledge,
+    processes: brainRow.processes,
+    judgment: brainRow.judgment,
+    skills: brainRow.skills,
+    markdown: {
+      knowledge_md: brainRow.knowledge_md,
+      processes_md: brainRow.processes_md,
+      judgment_md: brainRow.judgment_md
+    }
+  } as T;
 }

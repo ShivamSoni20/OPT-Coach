@@ -54,12 +54,12 @@ html {
 body {
   min-height: 100vh;
   background:
-    radial-gradient(ellipse at 10% 0%, rgba(77, 200, 189, 0.09) 0%, transparent 40%),
-    radial-gradient(ellipse at 90% 100%, rgba(184, 212, 176, 0.1) 0%, transparent 40%),
-    radial-gradient(ellipse at 50% 50%, rgba(221, 200, 154, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse at 10% 0%, rgba(77,200,189,.09) 0%, transparent 40%),
+    radial-gradient(ellipse at 90% 100%, rgba(184,212,176,.10) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, rgba(221,200,154,.05) 0%, transparent 60%),
     hsl(var(--background));
   color: hsl(var(--foreground));
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-dm-sans, "Segoe UI", "Helvetica Neue", Arial, sans-serif);
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
@@ -67,89 +67,65 @@ body {
 h1,
 h2,
 h3 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-dm-serif, Georgia, "Times New Roman", serif);
   letter-spacing: -0.02em;
 }
 
+code,
+pre,
+.font-mono {
+  font-family: var(--font-dm-mono, "Fira Code", Menlo, monospace);
+}
+
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 @keyframes ticker {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes floatBlob {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(20px, -15px) scale(1.04);
-  }
-  66% {
-    transform: translate(-10px, 12px) scale(0.97);
-  }
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulseLine {
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 1;
-  }
+  0%,100% { opacity: .4; }
+  50% { opacity: 1; }
+}
+
+@keyframes floatBlob {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(20px,-15px) scale(1.04); }
+  66% { transform: translate(-10px,12px) scale(.97); }
 }
 
 @keyframes orbitSlow {
-  from {
-    transform: rotate(0deg) translateX(var(--orbit-r)) rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg) translateX(var(--orbit-r)) rotate(-360deg);
-  }
+  from { transform: rotate(0deg) translateX(var(--orbit-r)) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(var(--orbit-r)) rotate(-360deg); }
 }
 
 @layer utilities {
   .surface-grid {
-    background-image: radial-gradient(circle, rgba(77, 200, 189, 0.1) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(77,200,189,.1) 1px, transparent 1px);
     background-size: 22px 22px;
   }
 
   .blob-teal {
-    background: radial-gradient(circle, rgba(77, 200, 189, 0.16), transparent 70%);
+    background: radial-gradient(circle, rgba(77,200,189,.16), transparent 70%);
     animation: floatBlob 12s ease-in-out infinite;
   }
 
   .blob-sage {
-    background: radial-gradient(circle, rgba(184, 212, 176, 0.18), transparent 70%);
+    background: radial-gradient(circle, rgba(184,212,176,.18), transparent 70%);
     animation: floatBlob 16s ease-in-out infinite;
   }
 
   .blob-wheat {
-    background: radial-gradient(circle, rgba(221, 200, 154, 0.14), transparent 70%);
+    background: radial-gradient(circle, rgba(221,200,154,.14), transparent 70%);
     animation: floatBlob 20s ease-in-out infinite;
   }
 
@@ -169,34 +145,27 @@ h3 {
     background-clip: text;
   }
 
-  .animate-ticker {
-    animation: ticker 24s linear infinite;
-  }
-
-  .animate-pulseLine {
-    animation: pulseLine 1.8s ease-in-out infinite;
-  }
-
-  .animate-shimmer {
-    animation: shimmer 2.4s linear infinite;
-  }
-
-  .text-balance {
-    text-wrap: balance;
-  }
+  .animate-ticker { animation: ticker 24s linear infinite; }
+  .animate-pulseLine { animation: pulseLine 1.8s ease-in-out infinite; }
+  .animate-shimmer { animation: shimmer 2.4s linear infinite; }
+  .animate-fadeUp { animation: fadeUp 0.5s ease both; }
+  .animate-floatBlob { animation: floatBlob 14s ease-in-out infinite; }
 
   .shadow-glow {
-    box-shadow: 0 0 0 3px rgba(77, 200, 189, 0.15), 0 4px 16px rgba(77, 200, 189, 0.2);
+    box-shadow: 0 0 0 3px rgba(77,200,189,.15), 0 4px 16px rgba(77,200,189,.2);
   }
+
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  * {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
