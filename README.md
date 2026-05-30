@@ -1,69 +1,183 @@
 # OPT Coach
 
-OPT Coach helps service businesses turn scattered tribal knowledge into a structured, AI-ready Company Brain. It guides a founder or operator through a short coaching flow, then generates clean markdown files, a shareable read-only page, and a public JSON endpoint that teams or AI agents can reuse.
+AI-guided Company Brain builder for service businesses. Turn founder knowledge, approval rules, workflows, pricing context, and hidden team judgment into structured markdown files, a shareable page, and a live JSON endpoint.
 
 Built for the OpenAI x Outskill Hackathon.
 
-## What It Does
+`Next.js` `TypeScript` `Supabase` `AIML API` `Vercel Analytics` `Tailwind CSS`
 
-- Captures business context through a guided 5-question coaching flow.
-- Generates `KNOWLEDGE.md`, `PROCESSES.md`, and `JUDGMENT.md`.
-- Stores sessions and generated brains in Supabase Postgres.
-- Provides a read-only share page for teammates.
-- Exposes a JSON API endpoint for each generated Company Brain.
-- Tracks page visits with Vercel Analytics.
+[Live Demo](https://opt-coach.vercel.app) · [Company Brain Flow](#core-flow) · [Architecture](#architecture) · [Database](#database-setup) · [Roadmap](#roadmap)
+
+## Overview
+
+OPT Coach helps small teams document what usually lives only in the founder's head.
+
+Most service businesses do not lack knowledge. They lack a clean operating brain that AI tools, teammates, and new hires can use. OPT Coach solves that with a short coaching flow: the user logs in, enters business details, answers focused operational questions, and receives a structured Company Brain.
+
+The generated output includes:
+
+- `KNOWLEDGE.md` for business model, clients, pricing, team structure, and metrics.
+- `PROCESSES.md` for workflows, owners, triggers, steps, and decision points.
+- `JUDGMENT.md` for quality criteria, approval rules, scoring logic, and escalation rules.
+- A read-only share page for teammates.
+- A raw JSON API endpoint for agent workflows.
+- A private dashboard for previous chats and generated brains.
+
+## Team
+
+| Member | Role |
+| --- | --- |
+| Shivam Soni | Project creator. Product idea, MVP direction, frontend iteration, testing, hackathon submission, and product positioning. |
+| Codex | AI pair-programming support for implementation, debugging, documentation, and production polish. |
+
+## Why OPT Coach
+
+| Problem | How OPT Coach solves it |
+| --- | --- |
+| Tribal knowledge is scattered | The coach asks structured questions and converts answers into reusable files. |
+| SOP writing is slow | The app generates process docs automatically from a conversation. |
+| AI agents lack business context | Every brain includes a machine-readable JSON endpoint. |
+| Team judgment is hard to document | The flow captures approval rules, quality criteria, and decision logic. |
+| Founders repeat explanations | Share pages and dashboards make knowledge reusable across the team. |
+
+## Features
+
+| Feature | Description |
+| --- | --- |
+| Guided Coaching Flow | A 5-question AI coach captures operating model, workflows, approvals, and hidden judgment. |
+| Auth + Dashboard | Users can create an account, log in, view previous chats, and open generated brains. |
+| Company Brain Generation | Converts a completed coaching session into `KNOWLEDGE.md`, `PROCESSES.md`, and `JUDGMENT.md`. |
+| Downloadable Files | Users can download each generated markdown file and the raw API payload. |
+| Share Page | Read-only public view for teammates, clients, or judges. |
+| API Endpoint | Each brain exposes JSON at `/brain/[id]/api` for AI agent workflows. |
+| Supabase Storage | Sessions and generated brains are stored in Supabase Postgres. |
+| Vercel Analytics | Production page views are tracked through Vercel Analytics. |
+| Responsive UI | Landing, login, dashboard, coach, brain view, and share pages are mobile-friendly. |
 
 ## Core Flow
 
 1. User opens the landing page.
-2. User enters business name and selects business type.
-3. OPT Coach starts a structured AI coaching session.
-4. User answers 5 focused questions about operations, workflows, approvals, and hidden judgment.
-5. The app generates a Company Brain.
-6. The user can view markdown files, share the read-only page, or open the raw JSON API.
+2. User logs in or creates an account.
+3. User opens the dashboard and starts a new Company Brain.
+4. User enters business name and selects a business type.
+5. OPT Coach starts the AI coaching session.
+6. User answers focused questions about operations, workflows, quality, and approvals.
+7. The app generates the Company Brain.
+8. User can view files, download files, share the page, or open the API endpoint.
+
+## Architecture
+
+```mermaid
+flowchart TD
+  A[Landing Page] --> B[Login / Signup]
+  B --> C[Dashboard]
+  C --> D[Onboarding]
+  D --> E[AI Coach]
+  E --> F[Generate Brain]
+  F --> G[Supabase Postgres]
+  G --> H[Brain Viewer]
+  H --> I[Markdown Tabs]
+  H --> J[Share Page]
+  H --> K[JSON API Endpoint]
+```
+
+## Key Technical Highlights
+
+### 1. Structured Knowledge Extraction
+
+The coach prompt is designed to capture the operating model, client profile, pricing, team roles, process steps, approval rules, and quality criteria. The goal is not just to chat, but to extract reusable business memory.
+
+### 2. AI-Ready Output Format
+
+The generated Company Brain is stored as both human-readable markdown and structured JSON. This makes it useful for teammates and for future AI agents that need business context.
+
+### 3. Supabase-Backed Session Storage
+
+The app stores active coaching sessions and generated brains in Supabase. A lightweight `kv` adapter keeps the application code simple while using Postgres as the primary database.
+
+### 4. Authenticated Dashboard
+
+Users can sign up, log in, and view saved brain files and previous chat sessions. The dashboard is designed as the user's private workspace.
+
+### 5. Shareable Knowledge Artifact
+
+Every generated brain has a clean read-only share page, so the result can be shown to teammates, judges, collaborators, or clients without exposing the full coaching session.
+
+### 6. Download + API Access
+
+Users can download `KNOWLEDGE.md`, `PROCESSES.md`, `JUDGMENT.md`, and the JSON API payload. This keeps the product useful even outside the web app.
 
 ## Tech Stack
 
-- Next.js 14 App Router
-- React 18
-- Tailwind CSS
-- AIML API through an OpenAI-compatible client
-- Supabase Postgres
-- Vercel Analytics
-- Vercel-ready deployment
+| Layer | Technology |
+| --- | --- |
+| Frontend | Next.js 14 App Router, React 18, TypeScript |
+| Styling | Tailwind CSS, custom pastel design system |
+| AI | AIML API through an OpenAI-compatible client |
+| Database | Supabase Postgres |
+| Auth | Supabase Auth |
+| Analytics | Vercel Analytics |
+| IDs | Nano ID |
+| Deployment | Vercel |
 
-## Project Structure
+## Repository Layout
 
 ```txt
 app/
-  api/
-    chat/              AI coach endpoint
-    generate/          Company Brain generation endpoint
-  brain/[id]/          Brain dashboard, share view, and JSON endpoint
-  coach/               Guided coaching UI
-  onboard/             Business setup flow
-  page.tsx             Landing page
+├── api/
+│   ├── chat/              # Streaming AI coach route
+│   └── generate/          # Company Brain generation route
+├── brain/[id]/            # Brain viewer, share page, and API endpoint
+├── coach/                 # Guided coaching experience
+├── dashboard/             # Logged-in workspace with saved brains and chats
+├── login/                 # Login and signup page
+├── onboard/               # Business setup flow
+└── page.tsx               # Landing page
 
 components/
-  brain/               Brain tabs, code viewer, share controls
-  coach/               Chat UI and progress components
-  ui/                  Shared shell and buttons
+├── analytics/             # Vercel Analytics client wrapper
+├── auth/                  # Login form and navbar auth status
+├── brain/                 # File tabs, code viewer, share panel
+├── coach/                 # Chat UI, input, progress, brain preview
+└── ui/                    # Shared shell and UI primitives
 
 lib/
-  ai.ts                AIML/OpenAI-compatible client setup
-  brain-generator.ts   Brain generation and output normalization
-  kv.ts                Supabase-backed storage adapter
-  prompts.ts           Coach and generation prompts
-  supabase.ts          Supabase clients
-  types.ts             Shared TypeScript types
+├── ai.ts                  # AIML/OpenAI-compatible client
+├── auth.ts                # API auth verification helpers
+├── brain-generator.ts     # Brain generation and JSON normalization
+├── kv.ts                  # Supabase-backed storage adapter
+├── prompts.ts             # Coach and brain-generation prompts
+├── supabase.ts            # Server Supabase client
+├── supabase-browser.ts    # Browser Supabase client
+├── types.ts               # Shared TypeScript types
+└── utils.ts               # Shared helper functions
 
 supabase/
-  migrations/          Database schema
+└── migrations/            # Database schema and dashboard auth migration
 ```
 
-## Environment Variables
+## Quick Start
 
-Create `.env.local` in the project root.
+### Prerequisites
+
+- Node.js 20+
+- Supabase project
+- AIML API key
+- Vercel account for deployment
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure Environment
+
+```bash
+cp .env.example .env.local
+```
+
+Set the required values:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
@@ -77,53 +191,7 @@ AIML_MODEL=openai/gpt-4o-mini
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### Notes
-
-- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are public client values from Supabase.
-- `SUPABASE_SERVICE_ROLE_KEY` is server-only. Never commit it or expose it in client code.
-- `AIML_MODEL` is set to `openai/gpt-4o-mini` because it was verified working during local testing.
-- Set `NEXT_PUBLIC_APP_URL` to your production Vercel URL after deployment.
-
-## Database Setup
-
-Apply the initial Supabase schema from:
-
-```txt
-supabase/migrations/001_initial_schema.sql
-```
-
-The migration creates:
-
-- `sessions` for active coaching sessions.
-- `brains` for generated Company Brain records.
-- expiry indexes for cleanup support.
-- RLS policies for public brain reads and server-side writes.
-
-After applying the migration, verify the tables exist in Supabase:
-
-```sql
-SELECT id, business_name, status, questions_answered
-FROM sessions
-ORDER BY created_at DESC
-LIMIT 5;
-```
-
-```sql
-SELECT id, business_name, business_type, session_duration
-FROM brains
-ORDER BY generated_at DESC
-LIMIT 5;
-```
-
-## Local Development
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Start the development server:
+### 3. Run Locally
 
 ```bash
 npm run dev
@@ -135,49 +203,99 @@ Open:
 http://localhost:3000
 ```
 
-## Testing Checklist
+## Database Setup
 
-- Landing page loads.
-- Onboarding captures business name and type.
-- Coach asks the first question automatically.
-- Chat replies stream correctly.
-- The 5-question flow completes.
-- Brain generation redirects to `/brain/[id]`.
-- `KNOWLEDGE.md`, `PROCESSES.md`, and `JUDGMENT.md` are populated.
-- Share page works at `/brain/[id]/share`.
-- API endpoint works at `/brain/[id]/api`.
-- Supabase receives rows in `sessions` and `brains`.
+Apply the Supabase migrations in order:
 
-## Deployment To Vercel
+```txt
+supabase/migrations/001_initial_schema.sql
+supabase/migrations/002_user_dashboard.sql
+```
+
+The schema creates:
+
+| Table | Purpose |
+| --- | --- |
+| `sessions` | Stores active and completed coaching sessions. |
+| `brains` | Stores generated Company Brain records and markdown outputs. |
+
+Verify recent sessions:
+
+```sql
+SELECT id, business_name, status, questions_answered
+FROM sessions
+ORDER BY created_at DESC
+LIMIT 5;
+```
+
+Verify generated brains:
+
+```sql
+SELECT id, business_name, business_type, session_duration
+FROM brains
+ORDER BY generated_at DESC
+LIMIT 5;
+```
+
+## Test Checklist
+
+- Landing page loads and CTAs work.
+- Login and signup work.
+- Dashboard shows user name and saved items.
+- Onboarding requires a business name.
+- Coach starts automatically after onboarding.
+- AI responses stream correctly.
+- Brain generation completes after the coaching flow.
+- Generated files are populated.
+- Download buttons work for markdown files and API payload.
+- Share page opens at `/brain/[id]/share`.
+- API endpoint returns JSON at `/brain/[id]/api`.
+- Mobile layout works on landing, onboarding, coach, dashboard, and brain pages.
+
+## Deployment
 
 1. Push the repository to GitHub.
-2. Import the repository in the Vercel dashboard.
-3. Select the default Next.js settings.
-4. Add all environment variables in Vercel Project Settings.
-5. Deploy the project.
-6. Copy the production URL.
-7. Update `NEXT_PUBLIC_APP_URL` in Vercel to the production URL.
-8. Redeploy.
+2. Import the project in Vercel.
+3. Add all environment variables in Vercel Project Settings.
+4. Deploy with the default Next.js settings.
+5. Update `NEXT_PUBLIC_APP_URL` to the production URL.
+6. Redeploy after setting the production URL.
 
-## Vercel Analytics
+Required production variables:
 
-Vercel Analytics is already installed and mounted in `app/layout.tsx`.
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+AIML_API_KEY=
+AIML_API_BASE_URL=https://api.aimlapi.com/v1
+AIML_MODEL=openai/gpt-4o-mini
+NEXT_PUBLIC_APP_URL=https://your-vercel-domain.vercel.app
+```
 
-After deployment:
+## Roadmap
 
-1. Visit the production site.
-2. Navigate between a few pages.
-3. Open the Vercel project dashboard.
-4. Check the Analytics tab after a short delay.
+| Phase | Focus |
+| --- | --- |
+| Phase 1 | Stabilize MVP, polish dashboard, complete Supabase user-scoped history. |
+| Phase 2 | Add editable brain files and regenerated sections. |
+| Phase 3 | Add team workspaces and collaborator access. |
+| Phase 4 | Add integrations for Notion, Google Docs, Slack, and agent tools. |
+| Phase 5 | Add templates for agencies, freelancers, consultants, and startups. |
 
-## Production Readiness Notes
+## Useful Links
 
-- Rotate any service role key that was ever pasted into chat or logs.
-- Keep `.env.local` out of Git.
-- Confirm Supabase RLS policies before public launch.
-- Use the verified AIML model in production.
-- Run a full end-to-end test after every deployment.
+- [OpenAI Platform](https://platform.openai.com/)
+- [AIML API](https://aimlapi.com/)
+- [Supabase Docs](https://supabase.com/docs)
+- [Next.js Docs](https://nextjs.org/docs)
+- [Vercel Analytics](https://vercel.com/docs/analytics)
+- [Tailwind CSS](https://tailwindcss.com/)
 
-## License
+## License & Credits
 
-This project is currently private and created for hackathon MVP development.
+Built for the OpenAI x Outskill Hackathon as an MVP.
+
+Created by Shivam Soni.
+
+OPT Coach turns scattered business knowledge into an AI-ready operating brain.
