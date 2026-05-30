@@ -3,40 +3,48 @@ const steps = [
   "Client onboarding",
   "Delivery workflow",
   "Quality and approval",
-  "Tribal knowledge"
+  "Tribal knowledge",
 ];
 
 export function ProgressSidebar({ questionsAnswered }: { questionsAnswered: number }) {
   return (
-    <aside className="hidden w-64 shrink-0 border-r border-border/70 bg-card/40 px-5 py-6 lg:block">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Questions</p>
-      <div className="mt-5 space-y-3">
+    <aside className="hidden w-60 shrink-0 border-r border-sage/30 bg-white/50 px-4 py-6 lg:block">
+      <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.15em] text-green-dk">
+        Questions
+      </p>
+      <div className="space-y-2">
         {steps.map((step, index) => {
           const isDone = index < questionsAnswered;
           const isCurrent = index === questionsAnswered;
 
           return (
             <div
-              className={`rounded-2xl border px-4 py-3 text-sm ${
-                isCurrent
-                  ? "border-primary/30 bg-primary/10 text-foreground"
-                  : isDone
-                    ? "border-border/50 bg-background/40 text-primary"
-                    : "border-transparent bg-transparent text-muted-foreground"
-              }`}
               key={step}
+              className={`rounded-xl border px-3 py-2.5 text-[12px] transition-all ${
+                isCurrent
+                  ? "border-teal/30 bg-teal-pale text-ink"
+                  : isDone
+                    ? "border-sage/25 bg-sage-pale text-green-dk"
+                    : "border-transparent bg-transparent text-ink-lt"
+              }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <div
-                  className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
-                    isDone ? "bg-primary text-primary-foreground" : isCurrent ? "bg-primary/15 text-primary" : "bg-background/70 text-muted-foreground"
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
+                    isDone
+                      ? "bg-green-dk text-white"
+                      : isCurrent
+                        ? "bg-teal/15 text-teal"
+                        : "bg-sage-pale text-ink-lt"
                   }`}
                 >
-                  {isDone ? "OK" : index + 1}
+                  {isDone ? "✓" : index + 1}
                 </div>
                 <div>
-                  <p className="font-medium">{step}</p>
-                  <p className="text-xs text-muted-foreground">{isDone ? "Captured" : isCurrent ? "In progress" : "Coming up"}</p>
+                  <p className="font-medium leading-tight">{step}</p>
+                  <p className="text-[10px] text-ink-lt">
+                    {isDone ? "Captured" : isCurrent ? "In progress" : "Coming up"}
+                  </p>
                 </div>
               </div>
             </div>

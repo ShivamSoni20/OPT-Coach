@@ -1,24 +1,25 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { CodeViewer } from "@/components/brain/code-viewer";
-import { Button } from "@/components/ui/button";
 import type { BrainRecord } from "@/lib/types";
 
 const tabs = [
   { id: "knowledge", label: "KNOWLEDGE.md" },
   { id: "processes", label: "PROCESSES.md" },
   { id: "judgment", label: "JUDGMENT.md" },
-  { id: "api", label: "API Endpoint" }
+  { id: "api", label: "API Endpoint" },
 ] as const;
 
-export function BrainTabs({ brain }: { brain: BrainRecord }) {
+function BrainTabsInner({ brain }: { brain: BrainRecord }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
-  const activeTab = (searchParams.get("tab") as (typeof tabs)[number]["id"] | null) ?? "knowledge";
+  const activeTab =
+    (searchParams.get("tab") as (typeof tabs)[number]["id"] | null) ?? "knowledge";
 
   const apiPayload = JSON.stringify(brain, null, 2);
 
@@ -35,7 +36,7 @@ export function BrainTabs({ brain }: { brain: BrainRecord }) {
     try {
       await navigator.clipboard.writeText(content);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
+      setTimeout(() => setCopied(false), 1800);
     } catch {
       setCopied(false);
     }
@@ -43,19 +44,18 @@ export function BrainTabs({ brain }: { brain: BrainRecord }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex flex-col gap-3 border-b border-border/70 px-4 py-4 sm:px-6">
+      <div className="flex flex-col gap-3 border-b border-sage/20 bg-white/40 px-4 py-3 sm:px-6">
         <div className="flex flex-wrap gap-2">
           {tabs.map((tab) => {
             const isActive = tab.id === activeTab;
-
             return (
               <button
-                className={`min-h-10 rounded-full border px-4 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-                  isActive
-                    ? "border-primary/30 bg-primary/10 text-foreground"
-                    : "border-border/60 bg-background/40 text-muted-foreground"
-                }`}
                 key={tab.id}
+                className={`rounded-full border px-4 py-1.5 text-[12px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/40 ${
+                  isActive
+                    ? "border-teal/30 bg-teal-pale text-green-dk"
+                    : "border-sage/25 bg-white/60 text-ink-lt hover:border-sage/40 hover:text-ink"
+                }`}
                 onClick={() => router.replace(`?tab=${tab.id}`)}
                 type="button"
               >
@@ -65,19 +65,43 @@ export function BrainTabs({ brain }: { brain: BrainRecord }) {
           })}
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-          <Button className="w-full sm:w-auto" onClick={handleCopy} variant="ghost">
-            {copied ? "Copied current tab" : "Copy current tab"}
-          </Button>
-          {activeTab === "api" ? (
-            <Button className="w-full sm:w-auto" href={`/brain/${brain.meta.id}/api`}>
-              Open raw API
-            </Button>
-          ) : null}
+          <button
+            className="inline-flex min-h-9 items-center justify-center rounded-xl border border-sage/30 bg-white/60 px-4 text-[12px] font-medium text-ink-md transition-all hover:border-teal/35 hover:bg-teal-pale hover:text-green-dk"
+            onClick={handleCopy}
+            type="button"
+          >
+            {copied ? "Copied ✓" : "Copy current tab"}
+          </button>
+          {activeTab === "api" && (
+            <a
+              className="inline-flex min-h-9 items-center justify-center rounded-xl bg-ink px-4 text-[12px] font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-md"
+              href={`/brain/${brain.meta.id}/api`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open raw API ↗
+            </a>
+          )}
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <CodeViewer content={content} />
       </div>
     </div>
+  );
+}
+
+export function BrainTabs({ brain }: { brain: BrainRecord }) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex-1 animate-pulse p-6">
+          <div className="h-8 w-64 rounded-xl bg-sage/20" />
+          <div className="mt-4 h-40 rounded-2xl bg-sage/10" />
+        </div>
+      }
+    >
+      <BrainTabsInner brain={brain} />
+    </Suspense>
   );
 }

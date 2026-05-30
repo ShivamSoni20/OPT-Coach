@@ -165,7 +165,7 @@ export default function CoachPage() {
             <div>
               <p className="font-display text-[15px] text-ink">OPT Coach</p>
               <p className="text-[12px] text-ink-lt">
-                {businessName || "Untitled business"} - {businessTypeLabels[businessType]} - {questionsAnswered}/5 answered
+                {businessName || "Untitled business"} · {businessTypeLabels[businessType]} · {questionsAnswered}/5 answered
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -248,6 +248,17 @@ export default function CoachPage() {
                   <div ref={bottomRef} />
                 </div>
 
+                <details className="border-t border-sage/20 bg-white/40 px-4 py-2 xl:hidden">
+                  <summary className="cursor-pointer text-[11px] font-medium text-green-dk">
+                    💡 Prompting tips
+                  </summary>
+                  <ul className="mt-2 space-y-1 pb-2 text-[11px] leading-5 text-ink-lt">
+                    <li>Use exact numbers: retainers, turnaround times, approval windows.</li>
+                    <li>Name real tools and owners — not just "the team".</li>
+                    <li>Call out failure cases and escalation rules.</li>
+                  </ul>
+                </details>
+
                 <ChatInput
                   disabled={isLoading || isGenerating}
                   isComplete={isGenerating}
@@ -255,7 +266,7 @@ export default function CoachPage() {
                 />
               </section>
 
-              <aside className="space-y-4 xl:sticky xl:top-5 xl:self-start">
+              <aside className="hidden space-y-4 xl:sticky xl:top-5 xl:block xl:self-start">
                 <BrainPreview questionsAnswered={questionsAnswered} />
                 <div className="rounded-[20px] border border-sage/30 bg-white/70 p-5">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-green-dk">

@@ -107,6 +107,9 @@ export default async function BrainPage({
                 >
                   Share link
                 </a>
+                <a href="/" className="text-[11px] text-ink-lt underline underline-offset-2 sm:hidden">
+                  ← Home
+                </a>
               </div>
             </div>
           </div>

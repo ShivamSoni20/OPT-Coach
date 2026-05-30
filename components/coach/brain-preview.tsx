@@ -2,29 +2,54 @@ export function BrainPreview({ questionsAnswered }: { questionsAnswered: number 
   const items = [
     {
       title: "KNOWLEDGE.md",
-      status: questionsAnswered >= 1 ? "Extracting client and pricing context" : "Waiting for first answer"
+      status:
+        questionsAnswered >= 1
+          ? "Extracting client and pricing context"
+          : "Waiting for first answer",
+      active: questionsAnswered >= 1,
     },
     {
       title: "PROCESSES.md",
-      status: questionsAnswered >= 2 ? "Building workflows and owners" : "Waiting for process detail"
+      status:
+        questionsAnswered >= 2
+          ? "Building workflows and owners"
+          : "Waiting for process detail",
+      active: questionsAnswered >= 2,
     },
     {
       title: "JUDGMENT.md",
-      status: questionsAnswered >= 4 ? "Capturing quality criteria and approval rules" : "Waiting for decision logic"
-    }
+      status:
+        questionsAnswered >= 4
+          ? "Capturing quality criteria"
+          : "Waiting for decision logic",
+      active: questionsAnswered >= 4,
+    },
   ];
 
   return (
-    <div className="rounded-3xl border border-border/70 bg-card/60 p-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Brain preview</p>
-      <div className="mt-4 space-y-3">
+    <div className="rounded-[18px] border border-sage/30 bg-white/70 p-4">
+      <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-green-dk">
+        Brain preview
+      </p>
+      <div className="space-y-2.5">
         {items.map((item) => (
-          <div className="rounded-2xl border border-border/60 bg-background/50 p-3" key={item.title}>
-            <div className="flex items-center justify-between gap-3">
-              <p className="font-mono text-xs text-foreground">{item.title}</p>
-              <div className="h-2 w-2 rounded-full bg-primary motion-safe:animate-pulseLine" />
+          <div
+            key={item.title}
+            className={`rounded-xl border p-3 transition-all ${
+              item.active
+                ? "border-teal/25 bg-teal-pale/50"
+                : "border-sage/20 bg-sage-pale/30"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <p className="font-mono text-[11px] font-medium text-ink">{item.title}</p>
+              <div
+                className={`h-1.5 w-1.5 rounded-full ${
+                  item.active ? "bg-teal animate-pulseLine" : "bg-sage"
+                }`}
+              />
             </div>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">{item.status}</p>
+            <p className="mt-1.5 text-[11px] leading-5 text-ink-lt">{item.status}</p>
           </div>
         ))}
       </div>

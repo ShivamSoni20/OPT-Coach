@@ -214,10 +214,10 @@ export default function LandingPage() {
       </section>
 
       <div className="border-y border-sage/25 bg-white/55 backdrop-blur-sm">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => (
+        <div className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-sage/20 lg:grid-cols-4">
+          {stats.map((stat) => (
             <div
-              className={`px-6 py-6 text-center ${index < stats.length - 1 ? "border-r border-sage/20" : ""}`}
+              className="px-6 py-6 text-center"
               key={stat.label}
             >
               <p className="font-display text-3xl text-teal-gradient">{stat.value}</p>
@@ -240,7 +240,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-6">
           {bentoItems.map((item) => (
             <article
-              className={`group relative overflow-hidden rounded-[20px] border p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md ${
+              className={`group relative min-h-[160px] overflow-hidden rounded-[20px] border p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md ${
                 item.accent
                   ? "border-teal/25 bg-gradient-to-br from-teal-pale/60 to-sage-pale/60"
                   : "border-sage/30 bg-white"
