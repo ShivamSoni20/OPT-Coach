@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { GridDots, ScreenShell, SectionBadge } from "@/components/ui/shell";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 import type { BusinessType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -23,23 +24,37 @@ export default function OnboardPage() {
   const router = useRouter();
   const [selected, setSelected] = useState<BusinessType>("agency");
   const [businessName, setBusinessName] = useState("");
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const summary = useMemo(
     () => options.find((option) => option.id === selected),
     [selected]
   );
 
   useEffect(() => {
-    const storedType = window.localStorage.getItem("businessType") as BusinessType | null;
-    const storedName = window.localStorage.getItem("businessName");
+    async function preparePage() {
+      const { data } = await supabaseBrowser.auth.getSession();
 
-    if (storedType) {
-      setSelected(storedType);
+      if (!data.session) {
+        router.replace("/login?redirect=/onboard");
+        return;
+      }
+
+      const storedType = window.localStorage.getItem("businessType") as BusinessType | null;
+      const storedName = window.localStorage.getItem("businessName");
+
+      if (storedType) {
+        setSelected(storedType);
+      }
+
+      if (storedName) {
+        setBusinessName(storedName);
+      }
+
+      setIsAuthChecking(false);
     }
 
-    if (storedName) {
-      setBusinessName(storedName);
-    }
-  }, []);
+    void preparePage();
+  }, [router]);
 
   function handleContinue() {
     const trimmedName = businessName.trim();
@@ -56,7 +71,13 @@ export default function OnboardPage() {
   return (
     <ScreenShell className="flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <GridDots />
-      <div className="relative z-10 w-full max-w-3xl rounded-[2rem] border border-border/70 bg-card/75 p-5 shadow-glow sm:p-8">
+      {isAuthChecking ? (
+        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-sage/30 bg-white/75 p-8 text-center shadow-glow">
+          <p className="font-display text-[28px] text-ink">Checking login...</p>
+          <p className="mt-2 text-[13px] text-ink-lt">Redirecting you if needed.</p>
+        </div>
+      ) : (
+        <div className="relative z-10 w-full max-w-3xl rounded-[2rem] border border-border/70 bg-card/75 p-5 shadow-glow sm:p-8">
         <SectionBadge>Step 1 of 2</SectionBadge>
         <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl">
           Tell us about your business
@@ -121,7 +142,8 @@ export default function OnboardPage() {
             Continue to OPT Coach
           </Button>
         </div>
-      </div>
+        </div>
+      )}
     </ScreenShell>
   );
 }

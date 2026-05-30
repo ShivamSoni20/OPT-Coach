@@ -10,6 +10,7 @@ import { ChatMessage } from "@/components/coach/chat-message";
 import { ProgressSidebar } from "@/components/coach/progress-sidebar";
 import { Button } from "@/components/ui/button";
 import { ScreenShell } from "@/components/ui/shell";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 import type { BusinessType, ChatMessage as ChatMessageType } from "@/lib/types";
 import { getNextQuestionCount, parseBrainReady } from "@/lib/utils";
 
@@ -31,7 +32,8 @@ const mobileSteps = [
 export default function CoachPage() {
   const router = useRouter();
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const [sessionId] = useState(() => nanoid());
+  const sessionIdRef = useRef("");
+  const [isMounted, setIsMounted] = useState(false);
   const [businessType, setBusinessType] = useState<BusinessType>("agency");
   const [businessName, setBusinessName] = useState("");
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
@@ -41,16 +43,38 @@ export default function CoachPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedType = window.localStorage.getItem("businessType") as BusinessType | null;
-    const storedName = window.localStorage.getItem("businessName") ?? "";
-    const resolvedType = storedType ?? "agency";
-
-    setBusinessType(resolvedType);
-    setBusinessName(storedName);
-
-    void sendMessageWithContext("__INIT__", resolvedType, storedName);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!isMounted) {
+      return;
+    }
+
+    async function startSession() {
+      if (!sessionIdRef.current) {
+        sessionIdRef.current = nanoid();
+      }
+
+      const { data } = await supabaseBrowser.auth.getSession();
+
+      if (!data.session) {
+        router.replace("/login?redirect=/coach");
+        return;
+      }
+
+      const storedType = window.localStorage.getItem("businessType") as BusinessType | null;
+      const storedName = window.localStorage.getItem("businessName") ?? "";
+      const resolvedType = storedType ?? "agency";
+
+      setBusinessType(resolvedType);
+      setBusinessName(storedName);
+
+      void sendMessageWithContext("__INIT__", resolvedType, storedName);
+    }
+
+    void startSession();
+  }, [isMounted, router]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -79,11 +103,21 @@ export default function CoachPage() {
     ]);
 
     try {
+      const { data } = await supabaseBrowser.auth.refreshSession();
+
+      if (!data.session) {
+        router.replace("/login?redirect=/coach");
+        throw new Error("Please login before continuing.");
+      }
+
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Authorization": `Bearer ${data.session.access_token}`,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          sessionId,
+          sessionId: sessionIdRef.current,
           businessType: resolvedType,
           businessName: resolvedName,
           userMessage: isInit ? "Start" : userText
@@ -91,7 +125,8 @@ export default function CoachPage() {
       });
 
       if (!response.ok || !response.body) {
-        throw new Error("Could not reach the coach. Please try again.");
+        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(payload?.error ?? "Could not reach the coach. Please try again.");
       }
 
       const reader = response.body.getReader();
@@ -137,14 +172,25 @@ export default function CoachPage() {
     setError(null);
 
     try {
+      const { data } = await supabaseBrowser.auth.refreshSession();
+
+      if (!data.session) {
+        router.replace("/login?redirect=/coach");
+        throw new Error("Please login before generating your brain.");
+      }
+
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId })
+        headers: {
+          "Authorization": `Bearer ${data.session.access_token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ sessionId: sessionIdRef.current })
       });
 
       if (!response.ok) {
-        throw new Error("Brain generation failed. Please retry.");
+        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(payload?.error ?? "Brain generation failed. Please retry.");
       }
 
       const payload = (await response.json()) as { brainId: string };
@@ -155,6 +201,10 @@ export default function CoachPage() {
       setError(message);
       setIsGenerating(false);
     }
+  }
+
+  if (!isMounted) {
+    return null;
   }
 
   return (

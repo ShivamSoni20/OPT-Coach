@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
+import { AuthStatus } from "@/components/auth/auth-status";
 import { cn } from "@/lib/utils";
 
 export function ScreenShell({
@@ -72,23 +74,22 @@ export function PageNav() {
   return (
     <header className="sticky top-0 z-20 border-b border-sage/30 bg-[rgba(247,244,238,.88)] backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-teal to-green-dk text-base shadow-glow">
-            🧠
+        <Link className="group flex items-center gap-3.5" href="/">
+          <div className="relative flex h-11 w-11 items-center justify-center rounded-[15px] bg-gradient-to-br from-ink via-green-dk to-teal text-[12px] font-semibold tracking-[-0.04em] text-white shadow-glow transition-all duration-300 group-hover:-translate-y-0.5 group-hover:rotate-[-2deg] group-hover:shadow-lg">
+            <span className="absolute inset-0 rounded-[15px] border border-white/25" />
+            <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-[#f7f4ee] bg-coral" />
+            OPT
           </div>
           <div>
-            <p className="font-display text-[15px] text-ink">OPT Coach</p>
-            <p className="text-[10px] tracking-wide text-ink-lt">Company Brain Builder</p>
+            <p className="font-display text-[18px] leading-none tracking-[-0.03em] text-ink transition-colors group-hover:text-green-dk">
+              OPT Coach
+            </p>
+            <p className="mt-1 text-[10px] tracking-[0.12em] text-ink-lt">Company Brain Builder</p>
           </div>
-        </div>
+        </Link>
         <SectionBadge>OpenAI x Outskill Hackathon</SectionBadge>
         <div className="flex items-center gap-2">
-          <a
-            className="inline-flex min-h-9 items-center rounded-xl bg-ink px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            href="/onboard"
-          >
-            Get started →
-          </a>
+          <AuthStatus />
         </div>
       </div>
     </header>

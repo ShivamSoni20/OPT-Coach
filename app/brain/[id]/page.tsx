@@ -95,6 +95,12 @@ export default async function BrainPage({
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
                 <a
                   className="inline-flex min-h-11 items-center justify-center rounded-xl border border-sage/30 bg-white/60 px-4 py-2 text-[12px] font-medium text-ink-md transition-all hover:border-teal/35 hover:bg-teal-pale hover:text-green-dk"
+                  href="/dashboard"
+                >
+                  Back to dashboard
+                </a>
+                <a
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-sage/30 bg-white/60 px-4 py-2 text-[12px] font-medium text-ink-md transition-all hover:border-teal/35 hover:bg-teal-pale hover:text-green-dk"
                   href={apiUrl}
                   rel="noreferrer"
                   target="_blank"

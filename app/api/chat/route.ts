@@ -1,4 +1,5 @@
 import { AIML_MODEL, getAiClient } from "@/lib/ai";
+import { getAuthenticatedUser } from "@/lib/auth";
 import { kvGet, kvSet } from "@/lib/kv";
 import { OPT_COACH_SYSTEM } from "@/lib/prompts";
 import type { ChatRoutePayload, SessionState } from "@/lib/types";
@@ -7,6 +8,11 @@ import { getNextQuestionCount, parseBrainReady } from "@/lib/utils";
 export async function POST(request: Request) {
   try {
     const aiClient = getAiClient();
+    const user = await getAuthenticatedUser(request);
+
+    if (!user) {
+      return Response.json({ error: "Login required." }, { status: 401 });
+    }
 
     const { sessionId, userMessage, businessType, businessName } =
       (await request.json()) as ChatRoutePayload;
@@ -22,6 +28,7 @@ export async function POST(request: Request) {
       (await kvGet<SessionState>(`session:${sessionId}`)) ??
       ({
         id: sessionId,
+        userId: user.id,
         businessType: businessType ?? "agency",
         businessName,
         messages: [],
@@ -31,6 +38,11 @@ export async function POST(request: Request) {
         createdAt: new Date().toISOString()
       } satisfies SessionState);
 
+    if (session.userId && session.userId !== user.id) {
+      return Response.json({ error: "You do not have access to this session." }, { status: 403 });
+    }
+
+    session.userId = user.id;
     session.businessType = businessType ?? session.businessType;
     session.businessName = businessName ?? session.businessName;
 

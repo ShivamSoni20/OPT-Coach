@@ -9,6 +9,7 @@ type KvTable = "sessions" | "brains";
 
 type SessionRow = {
   id: string;
+  user_id?: string | null;
   business_type: SessionState["businessType"];
   business_name: string | null;
   messages: SessionState["messages"];
@@ -21,6 +22,7 @@ type SessionRow = {
 
 type BrainRow = {
   id: string;
+  user_id?: string | null;
   business_name: string;
   business_type: BrainRecord["meta"]["businessType"];
   generated_at: string;
@@ -76,6 +78,22 @@ export async function kvSet<T>(key: string, value: T, options?: SetOptions): Pro
       ? await supabaseAdmin.from("sessions").upsert(row as SessionRow, { onConflict: "id" })
       : await supabaseAdmin.from("brains").upsert(row as BrainRow, { onConflict: "id" });
 
+  if (error?.message.includes("user_id")) {
+    const fallbackRow = { ...(row as Record<string, unknown>) };
+    delete fallbackRow.user_id;
+
+    const retry =
+      table === "sessions"
+        ? await supabaseAdmin.from("sessions").upsert(fallbackRow, { onConflict: "id" })
+        : await supabaseAdmin.from("brains").upsert(fallbackRow, { onConflict: "id" });
+
+    if (retry.error) {
+      throw new Error(`kvSet failed: ${retry.error.message}`);
+    }
+
+    return;
+  }
+
   if (error) {
     throw new Error(`kvSet failed: ${error.message}`);
   }
@@ -108,6 +126,7 @@ function serialize(
 
     return {
       id,
+      user_id: session.userId ?? null,
       business_type: session.businessType,
       business_name: session.businessName ?? null,
       messages: session.messages,
@@ -123,6 +142,7 @@ function serialize(
 
   return {
     id,
+    user_id: brain.meta.userId ?? null,
     business_name: brain.meta.businessName,
     business_type: brain.meta.businessType,
     generated_at: brain.meta.generatedAt,
@@ -144,6 +164,7 @@ function deserialize<T>(table: KvTable, row: SessionRow | BrainRow): T {
 
     return {
       id: sessionRow.id,
+      userId: sessionRow.user_id ?? undefined,
       businessType: sessionRow.business_type,
       businessName: sessionRow.business_name ?? undefined,
       messages: sessionRow.messages,
@@ -157,9 +178,10 @@ function deserialize<T>(table: KvTable, row: SessionRow | BrainRow): T {
   const brainRow = row as BrainRow;
 
   return {
-    meta: {
-      id: brainRow.id,
-      businessName: brainRow.business_name,
+      meta: {
+        id: brainRow.id,
+        userId: brainRow.user_id ?? undefined,
+        businessName: brainRow.business_name,
       businessType: brainRow.business_type,
       generatedAt: brainRow.generated_at,
       sessionDuration: brainRow.session_duration

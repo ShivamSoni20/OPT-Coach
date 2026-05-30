@@ -34,6 +34,7 @@ export interface Skill {
 export interface BrainData {
   meta: {
     id: string;
+    userId?: string;
     businessName: string;
     businessType: BusinessType;
     generatedAt: string;
@@ -68,6 +69,7 @@ export interface BrainRecord extends BrainData {
 
 export interface SessionState {
   id: string;
+  userId?: string;
   businessType: BusinessType;
   businessName?: string;
   messages: ChatMessage[];

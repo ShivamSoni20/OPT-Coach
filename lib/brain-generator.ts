@@ -145,6 +145,7 @@ export async function generateBrainFromSession(session: SessionState): Promise<B
   const brain: BrainRecord = {
     meta: {
       id: brainId,
+      userId: session.userId,
       businessName: session.businessName || "Untitled Business",
       businessType: session.businessType,
       generatedAt: new Date().toISOString(),

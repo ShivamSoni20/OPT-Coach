@@ -8,10 +8,10 @@ import { CodeViewer } from "@/components/brain/code-viewer";
 import type { BrainRecord } from "@/lib/types";
 
 const tabs = [
-  { id: "knowledge", label: "KNOWLEDGE.md" },
-  { id: "processes", label: "PROCESSES.md" },
-  { id: "judgment", label: "JUDGMENT.md" },
-  { id: "api", label: "API Endpoint" },
+  { id: "knowledge", label: "KNOWLEDGE.md", filename: "KNOWLEDGE.md" },
+  { id: "processes", label: "PROCESSES.md", filename: "PROCESSES.md" },
+  { id: "judgment", label: "JUDGMENT.md", filename: "JUDGMENT.md" },
+  { id: "api", label: "API Endpoint", filename: "brain-api-payload.json" },
 ] as const;
 
 function BrainTabsInner({ brain }: { brain: BrainRecord }) {
@@ -20,6 +20,7 @@ function BrainTabsInner({ brain }: { brain: BrainRecord }) {
   const [copied, setCopied] = useState(false);
   const activeTab =
     (searchParams.get("tab") as (typeof tabs)[number]["id"] | null) ?? "knowledge";
+  const activeTabConfig = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
   const apiPayload = JSON.stringify(brain, null, 2);
 
@@ -40,6 +41,20 @@ function BrainTabsInner({ brain }: { brain: BrainRecord }) {
     } catch {
       setCopied(false);
     }
+  }
+
+  function handleDownload() {
+    const blob = new Blob([content], {
+      type: activeTab === "api" ? "application/json" : "text/markdown",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${slugify(brain.meta.businessName)}-${activeTabConfig.filename}`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -72,6 +87,13 @@ function BrainTabsInner({ brain }: { brain: BrainRecord }) {
           >
             {copied ? "Copied ✓" : "Copy current tab"}
           </button>
+          <button
+            className="inline-flex min-h-9 items-center justify-center rounded-xl border border-sage/30 bg-white/60 px-4 text-[12px] font-medium text-ink-md transition-all hover:border-teal/35 hover:bg-teal-pale hover:text-green-dk"
+            onClick={handleDownload}
+            type="button"
+          >
+            Download {activeTabConfig.filename}
+          </button>
           {activeTab === "api" && (
             <a
               className="inline-flex min-h-9 items-center justify-center rounded-xl bg-ink px-4 text-[12px] font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-md"
@@ -103,5 +125,14 @@ export function BrainTabs({ brain }: { brain: BrainRecord }) {
     >
       <BrainTabsInner brain={brain} />
     </Suspense>
+  );
+}
+
+function slugify(value: string) {
+  return (
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "company-brain"
   );
 }

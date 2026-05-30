@@ -1,9 +1,16 @@
 import { generateBrainFromSession } from "@/lib/brain-generator";
+import { getAuthenticatedUser } from "@/lib/auth";
 import { kvGet, kvSet } from "@/lib/kv";
 import type { SessionState } from "@/lib/types";
 
 export async function POST(request: Request) {
   try {
+    const user = await getAuthenticatedUser(request);
+
+    if (!user) {
+      return Response.json({ error: "Login required." }, { status: 401 });
+    }
+
     const { sessionId } = (await request.json()) as { sessionId?: string };
 
     if (!sessionId) {
@@ -16,6 +23,11 @@ export async function POST(request: Request) {
       return Response.json({ error: "Session not found." }, { status: 404 });
     }
 
+    if (session.userId && session.userId !== user.id) {
+      return Response.json({ error: "You do not have access to this session." }, { status: 403 });
+    }
+
+    session.userId = user.id;
     const brain = await generateBrainFromSession(session);
     await kvSet(`brain:${brain.meta.id}`, brain, { ex: 60 * 60 * 24 * 30 });
 

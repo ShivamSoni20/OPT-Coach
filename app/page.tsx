@@ -126,10 +126,10 @@ export default function LandingPage() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                href="/onboard"
+                href="/login?redirect=/dashboard"
                 className="inline-flex items-center gap-2 rounded-xl bg-ink px-7 py-3.5 text-[15px] font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                🧠 Build My Company Brain →
+                🧠 Login to dashboard →
               </Link>
               <Link
                 href="#how"
@@ -347,10 +347,10 @@ export default function LandingPage() {
               Join 500+ Indian service businesses who built their AI-ready knowledge base in one session.
             </p>
             <Link
-              href="/onboard"
+              href="/login?redirect=/dashboard"
               className="mt-7 inline-flex items-center gap-2 rounded-xl bg-ink px-8 py-4 text-[15px] font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              🧠 Start building - it&apos;s free →
+              🧠 Login and start building →
             </Link>
           </div>
         </div>
