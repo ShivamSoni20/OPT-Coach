@@ -252,27 +252,6 @@ LIMIT 5;
 - API endpoint returns JSON at `/brain/[id]/api`.
 - Mobile layout works on landing, onboarding, coach, dashboard, and brain pages.
 
-## Deployment
-
-1. Push the repository to GitHub.
-2. Import the project in Vercel.
-3. Add all environment variables in Vercel Project Settings.
-4. Deploy with the default Next.js settings.
-5. Update `NEXT_PUBLIC_APP_URL` to the production URL.
-6. Redeploy after setting the production URL.
-
-Required production variables:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-AIML_API_KEY=
-AIML_API_BASE_URL=https://api.aimlapi.com/v1
-AIML_MODEL=openai/gpt-4o-mini
-NEXT_PUBLIC_APP_URL=https://your-vercel-domain.vercel.app
-```
-
 ## Roadmap
 
 | Phase | Focus |
